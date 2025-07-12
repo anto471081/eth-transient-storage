@@ -1,0 +1,27 @@
+{
+  "name": "eth-transient-storage",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anto471081/eth-transient-storage.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/anto471081/eth-transient-storage/issues"
+  },
+  "homepage": "https://github.com/anto471081/eth-transient-storage#readme",
+  "description": "",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "ethers": "^5.8.0",
+    "fs-extra": "^11.3.0",
+    "hardhat": "^2.25.0",
+    "hardhat-tracer": "^3.2.1"
+  }
+}
