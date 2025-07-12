@@ -5,8 +5,8 @@ Licenza: MIT
 ===  Struttura del progetto
 
 /
-├─ contracts/              
-│  ├─ OraMemory.sol        
+├─ contracts/             
+│  ├─ OraMemory.sol       
 │  ├─ OraStorage.sol       
 │  ├─ OraTransient.sol     
 │  ├─ ReeStorage.sol       
@@ -58,7 +58,7 @@ npx hardhat run scripts/reentrancy_metrics_compute.js
 
 <input file> python3 scripts/oracle_aggregator_metrics_plot.py
 
-== Esempi di esecuzione reale degli script coi parametri (reentrancy)
+=== Esempi di esecuzione reale degli script coi parametri (reentrancy)
 
 ITERATIONS=5000 SC_01=ReeStorage SC_02=ReeTransient npx hardhat run scripts/reentrancy_metrics_compute.js
 
