@@ -6,7 +6,7 @@ module.exports = {
     settings: { optimizer: { enabled: true, runs: 200 }, evmVersion: "cancun" }
   },
   networks: {
-    hardhat: { hardfork: "cancun", initialBaseFeePerGas:0, blockGasLimit:15_000_000, allowUnlimitedContractSize:true }
+    hardhat: { hardfork: "cancun", initialBaseFeePerGas:0, blockGasLimit:150_000_000, allowUnlimitedContractSize:true, gasPrice: 205000000 }
   }
 };
 

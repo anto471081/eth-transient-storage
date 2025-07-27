@@ -44,7 +44,8 @@ async function main() {
   }
 
   // Ottenimento gasPrice e inizializzazione array risultati
-  const gasPrice = await hre.ethers.provider.getGasPrice();
+  const gasPrice = hre.network.config.gasPrice;
+  console.log(`Gas price fissato a ${gasPrice.toString()} Wei`);
   const results = [];
 
   // Ciclo sui contratti aggregatori da testare
@@ -83,18 +84,29 @@ async function main() {
 
     console.log(`Benchmark: ${name}.aggregateQuotes() ${ITERATIONS} iterazioni`);
     for (let i = 1; i <= ITERATIONS; i++) {
-      const gasUsedBN = await inst.estimateGas.aggregateQuotes(oracles);
-      const gasUsed = gasUsedBN.toNumber();
-      const feeWei  = gasUsedBN.mul(gasPrice).toString();
-      results.push({
-        contract:   name,
-        action:     "aggregateQuotes",
-        iteration:  i,
-        gasUsed,
-        gasPrice:   gasPrice.toString(),
-        feeWei,
-        txSizeBytes: callDataSize
-      });
+      try {
+         const gasUsedBN   = await inst.estimateGas.aggregateQuotes(oracles);   
+         const gasUsed     = gasUsedBN.toNumber();   
+         const feeWei      = gasUsedBN.mul(gasPrice).toString();   
+
+         results.push({   
+            contract:   name,   
+            action:     "aggregateQuotes",   
+            iteration:  i,   
+            gasUsed,   
+            gasPrice:   gasPrice.toString(),   
+            feeWei,   
+            txSizeBytes: callDataSize   
+         });   
+
+         // Log ogni 100 iterazioni   
+         if (i % 5 === 0) {   
+            console.log(`Iterazione ${i} completata per ${name}`);   
+         }   
+
+      } catch (error) {   
+         console.error(`Errore all'iterazione ${i} per ${name}:`, error.message || error);   
+      }   
     }
   }
   

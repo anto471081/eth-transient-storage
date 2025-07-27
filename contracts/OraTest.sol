@@ -3,8 +3,8 @@ pragma solidity ^0.8.28;
 
 /**
  * @title Oracle Aggregator Test
- * @notice Contratto di esempio che espone un prezzo fisso per scopi di test.
- * @dev    Usato negli script di test per restituire sempre lo stesso valore.
+ * @notice Smarr Contract di esempio che espone un prezzo fisso per scopi di test
+ * @dev    Usato negli script di test per restituire sempre lo stesso valore
  * 2025
  */
 contract OraTest {

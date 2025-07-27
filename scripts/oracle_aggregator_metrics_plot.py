@@ -77,7 +77,7 @@ def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     PRICE_USD = float(os.environ.get("PRICE_USD", "2000.0"))
-    MAX_CALLS = int(os.environ.get("MAX_CALLS", "1"))
+    MAX_CALLS = int(os.environ.get("MAX_CALLS", "100"))
 
     # Verifica che METRICS_JSON (default 'metrics_output.json') esista
     if not os.path.isfile(METRICS_JSON):

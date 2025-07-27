@@ -70,6 +70,6 @@ ORACLE_COUNT=50 ITERATIONS=10 SC_TEST=OraTest SC_01=OraMemory SC_02=OraTransient
 
 ORACLE_COUNT=50 ITERATIONS=10 SC_TEST=OraTest SC_01=OraStorage SC_02=OraTransient npx hardhat run scripts/oracle_aggregator_metrics_compute.js
 
-python3 METRICS_JSON=results/OraMemory_OraTransient/metrics_output.json python3 scripts/oracle_aggregator_metrics_plot.py
+METRICS_JSON=results/OraMemory_OraTransient/metrics_output.json python3 scripts/oracle_aggregator_metrics_plot.py
 
-python3 METRICS_JSON=results/OraStorage_OraTransient/metrics_output.json python3 scripts/oracle_aggregator_metrics_plot.py
+METRICS_JSON=results/OraStorage_OraTransient/metrics_output.json python3 scripts/oracle_aggregator_metrics_plot.py

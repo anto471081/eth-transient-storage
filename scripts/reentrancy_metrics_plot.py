@@ -81,7 +81,7 @@ def main():
         sys.exit(1)
 
     PRICE_USD = float(os.environ.get('PRICE_USD', '2000.0'))
-    MAX_CALLS = int(os.environ.get('MAX_CALLS', '1000000'))
+    MAX_CALLS = int(os.environ.get('MAX_CALLS', '100'))
 
     # --- Caricamento del JSON di metriche ---
     with open(METRICS_JSON, 'r') as f:

@@ -2,9 +2,9 @@
 pragma solidity ^0.8.28;
 
 /**
- * @title Reentrancy Lock tramite Storage Permanente
- * @notice Protegge la funzione `claimReward` da attacchi di reentrancy utilizzando una variabile in storage
- * @dev Impiega `SSTORE`/`SLOAD` per settare e resettare un flag booleano; le funzioni protette devono usare il modifier `nonReentrant`
+ * @title Protezione da Reentrancy con variabile memorizzata in storage
+ * @notice Protegge da Reentrancy usando `bool locked` come flag temporanea salvata su storage
+ * @dev Le funzioni protette devono usare il modifier `nonReentrant`
  * 2025
  */
 contract ReeStorage {
@@ -14,19 +14,23 @@ contract ReeStorage {
      */
     event RewardClaimed(address indexed caller);
 
-    /// @dev Flag booleano in storage che indica se il contratto è in esecuzione protetta
+    /// @dev Flag booleano in storage che indica se lo Smart Contract è in esecuzione protetta
     bool private locked;
 
     /**
-     * @notice Modifier che impedisce chiamate ricorsive non autorizzate
-     * @dev 
-     * 1) Verifica con `SLOAD` che `locked` sia `false`; in caso contrario reverta con messaggio  
-     * 2) Imposta `locked = true` con `SSTORE` prima di eseguire la funzione  
-     * 3) Al termine dell’esecuzione, ripristina `locked = false`  
+     * @dev Modifier che protegge da attacchi di reentrancy usando storage
+     * 
+     * Utilizza la variabile `bool locked`, che viene memorizzata in storage
+     * 
+     * Controlla che `locked` sia `false`, altrimenti revert
+     * Imposta `locked = true` per bloccare ulteriori chiamate durante l’esecuzione
+     * Esegue la funzione claimReward() protetta
+     * Rilascia il locked impostando `locked = false`.
+     * 
      */
     modifier nonReentrant() {
         // 1) Se il lock è già attivo, blocca l’esecuzione
-        require(!locked, "StorageLock: reentrant");
+        require(!locked, "StorageLock: Reentrancy");
         // 2) Attiva il lock
         locked = true;
         // 3) Esegue la funzione protetta
@@ -38,7 +42,7 @@ contract ReeStorage {
     /**
      * @notice Reclama una ricompensa, protetto dal modifier `nonReentrant`
      * @dev 
-     * 1) Effettua una chiamata esterna a `_inner` per misurare l’overhead  
+     * 1) Effettua una chiamata esterna a `_inner`  
      * 2) Se la chiamata ha successo, emette `RewardClaimed`; in caso contrario revert con messaggio  
      */
     function claimReward() external nonReentrant {
@@ -59,8 +63,8 @@ contract ReeStorage {
     }
 
     /**
-     * @notice Funzione interna pura usata per misurare l’overhead di chiamata
-     * @dev Non modifica alcuno stato; serve solo a generare una transazione on-chain
+     * @notice Funzione espediente per distinguere il costo “puro” del meccanismo di protezione dalla logica effettiva della funzione claimReward() 
+     * @dev Esegue un CALL esterno, simulando un funzionamento in contesto reale 
      */
     function _inner() external pure {
         // nessuna operazione

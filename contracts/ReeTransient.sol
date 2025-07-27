@@ -2,64 +2,69 @@
 pragma solidity ^0.8.28;
 
 /**
- * @title Reentrancy Lock tramite Transient Storage
- * @notice Protegge la funzione `claimReward` da attacchi di reentrancy sfruttando la memoria transitoria (EIP-1153)
- * @dev Il modifier `nonReentrantTransient` utilizza gli opcode `TSTORE`/`TLOAD` per impostare un lock volatile
- * all’ingresso e rilasciarlo al termine della funzione, senza alcuna scrittura permanente in storage.
+ * @title Protezione da Reentrancy con variabile memorizzata in transient storage
+ * @notice Protegge da Reentrancy usando `bool transient locked` come flag temporanea salvata su transient storage
+ * @dev Le funzioni protette devono usare il modifier `nonReentrantTransient`
  * 2025
  */
 contract ReeTransient {
-    /// @dev Emesso quando la ricompensa viene reclamata con successo
-    event GiftClaimedTransient(address indexed caller);
+    /**
+     * @dev Emesso quando la funzione protetta termina con successo e la ricompensa viene reclamata
+     * @param caller Indirizzo che ha invocato con successo `claimReward`
+     */
+    event RewardClaimed(address indexed caller);
+
+    /// @dev Flag salvato transient storage, esiste solo durente la transazione. Indica se lo Smart Contract è in esecuzione protetta
+    bool transient locked;
 
     /**
-     * @dev Modifier che impedisce la reentrancy usando transient storage:
-     *      all’ingresso calcola una chiave univoca in memoria, verifica con `tload` che non sia già impostata,
-     *      imposta il lock con `tstore`, esegue la funzione e infine rilascia il lock con un secondo `tstore`.
-     *      In caso di tentativo di reentrancy, esegue un `revert` immediato.
+     * @dev Modifier che protegge da attacchi di reentrancy usando transient storage
+     * 
+     * Utilizza la variabile `bool transient locked`, che viene memorizzata in transient storage
+     * 
+     * Controlla che `locked` sia `false`, altrimenti revert
+     * Imposta `locked = true` per bloccare ulteriori chiamate durante l’esecuzione
+     * Esegue la funzione claimReward() protetta
+     * Rilascia il locked impostando `locked = false`.
+     * 
      */
     modifier nonReentrantTransient() {
-        assembly {
-            // carica 32 byte a zero in memory per il calcolo della chiave
-            mstore(0x00, 0)
-            let key := keccak256(0x00, 0x20)
-            // se il lock è già attivo, revert istantaneo
-            if tload(key) { revert(0, 0) }
-            // acquisisci il lock (tstore = 1)
-            tstore(key, 1)
-        }
-        _; // esegue la funzione protetta
-        assembly {
-		    mstore(0x00, 0)
-			let key := keccak256(0x00, 0x20)
-            // rilascia il lock (tstore = 0)
-            tstore(key, 0)
-        }
+        // 1) Se il lock è già attivo, blocca l’esecuzione
+        require(!locked, "Transientlocked: Reentrancy");
+        // 2) Attiva il lock
+        locked = true;
+        // 3) Esegue la funzione protetta
+        _;
+        // 4) Disattiva il lock
+        locked = false;		
     }
 
     /**
-     * @notice Reclama la ricompensa protetta dal reentrancy guard
-     * @dev Applica `nonReentrantTransient` per impedire reentrancy, chiama `_inner()` per misurare
-     * l’overhead e, in caso di successo, emette `GiftClaimedTransient`; altrimenti revert.
+     * @notice Reclama una ricompensa, protetto dal modifier `nonReentrantTransient`
+     * @dev 
+     * 1) Effettua una chiamata esterna a `_inner`  
+     * 2) Se la chiamata ha successo, emette `RewardClaimed`; in caso contrario revert con messaggio  
      */
     function claimReward() external nonReentrantTransient {
         bool success;
-        // esegue una chiamata interna isolata per misurare il sovraccarico del guard
+        // Chiamata esterna isolata per misurare il sovraccarico del lock
         try this._inner() {
             success = true;
         } catch {
             success = false;
         }
+        // Se l’operazione interna ha avuto esito positivo, emetto evento
         if (success) {
-            emit GiftClaimedTransient(msg.sender);
+            emit RewardClaimed(msg.sender);
         } else {
-            revert("TransientLock: inner fallita");
+            // In caso di fallimento, revert con messaggio descrittivo
+            revert("Transientlocked: inner fallita");
         }
     }
 
     /**
-     * @notice Funzione pura usata per isolare e misurare l’overhead di chiamata
-     * @dev Non altera alcuno stato, serve esclusivamente a generare una transazione on-chain
+     * @notice Funzione espediente per distinguere il costo “puro” del meccanismo di protezione dalla logica effettiva della funzione claimReward() 
+     * @dev Esegue un CALL esterno, simulando un funzionamento in contesto reale 
      */
     function _inner() external pure {
         // nessuna operazione

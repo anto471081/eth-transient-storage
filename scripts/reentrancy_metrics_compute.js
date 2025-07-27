@@ -30,7 +30,7 @@ async function main() {
   console.log(`OUTPUT_FILE=${OUTPUT_FILE}`);
 
   // Preleva il gasPrice corrente dal provider Hardhat
-  const gasPrice = await hre.ethers.provider.getGasPrice();
+  const gasPrice = hre.network.config.gasPrice;
   console.log(`Gas price fissato a ${gasPrice.toString()} Wei`);
 
   // Array per raccogliere tutte le misurazioni
