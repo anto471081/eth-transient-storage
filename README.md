@@ -9,6 +9,7 @@ Licenza: MIT
 │  ├─ OraMemory.sol       
 │  ├─ OraStorage.sol       
 │  ├─ OraTransient.sol     
+│  ├─ OraTransientNA.sol     
 │  ├─ ReeStorage.sol       
 │  └─ ReeTransient.sol     
 ├─ scripts/                
