@@ -27,8 +27,7 @@ contract OraTransientNA {
         returns (uint256 avgPrice)
     {
 		uint256 len = oracles.length;
-        require(len > 0, "Nessun oracolo presente");
-		sumTransient = 0; 											//scrittura in transient storage
+        require(len > 0, "Nessun oracolo presente");											//scrittura in transient storage
         for (uint256 i = 0; i < len; ++i) {
             sumTransient += IOraTest(oracles[i]).fetchPrice();								//lettura e scrittura su transient storage
         }
