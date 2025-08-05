@@ -14,7 +14,6 @@ interface IOraTest {
 contract OraTransientNA {
 
 	uint256 transient sumTransient; 	// somma dei prezzi degli oracoli
-	uint256 transient priceTransient;   // prezzo dell'oracolo corrente che è sovrascritto ad ogni iterazione
 	
     /**
      * @notice Calcola la media dei prezzi restituiti dagli oracoli
@@ -31,8 +30,7 @@ contract OraTransientNA {
         require(len > 0, "Nessun oracolo presente");
 		sumTransient = 0; 											//scrittura in transient storage
         for (uint256 i = 0; i < len; ++i) {
-            priceTransient = IOraTest(oracles[i]).fetchPrice();		//scrittura in transient storage
-            sumTransient += priceTransient;							//lettura e scrittura su transient storage
+            sumTransient += IOraTest(oracles[i]).fetchPrice();								//lettura e scrittura su transient storage
         }
 
         avgPrice = sumTransient / len;								//lettura da transient storage
